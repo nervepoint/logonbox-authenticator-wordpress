@@ -8,11 +8,11 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 try {
 
-    $remoteService = new RemoteServiceImpl("corp.logonbox.directory");
+    $remoteService = new RemoteServiceImpl("some.directory");
     $authenticatorClient = new AuthenticatorClient($remoteService);
     $authenticatorClient->debug(true);
 
-    $principal = "gaurav.bagga@protonmail.com";
+    $principal = "user@user.com";
 
     $response = $authenticatorClient->authenticate($principal);
     $result = $response->verify();
