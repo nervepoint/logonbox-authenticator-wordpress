@@ -8,4 +8,4 @@ Wordpress Plugin for LogonBox Authenticator
 
 
 
-Please run composer inside "**src**" folder
+Please run composer for "**src**" folder
