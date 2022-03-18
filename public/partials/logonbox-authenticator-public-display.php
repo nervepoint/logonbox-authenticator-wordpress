@@ -106,16 +106,26 @@ use RemoteService\RemoteServiceImpl;
         } else {
             Logonbox_Authenticator_Util::info_log("No payload data found in session clearing session.");
             wp_logout();
+
+            wp_redirect(wp_login_url("", true));
         }
 
         exit();
 
     } catch (Exception $e) {
+        if ($e->getMessage() == "The keystore rejected the signature request.") {
 
-        $tracker = Logonbox_Authenticator_Util::tracker_code();
-        Logonbox_Authenticator_Util::error_log("Tracker: " . $tracker . " : " . $e, $e);
+            Logonbox_Authenticator_Util::info_log("The keystore rejected the signature request.");
+            wp_logout();
 
-        echo "<style>.parent {
+            $_SESSION[Logonbox_Authenticator_Constants::SESSION_REJECT_FLASH_MESSAGE] = "true";
+            wp_redirect(wp_login_url("", true));
+
+        } else {
+            $tracker = Logonbox_Authenticator_Util::tracker_code();
+            Logonbox_Authenticator_Util::error_log("Tracker: " . $tracker . " : " . $e, $e);
+
+            echo "<style>.parent {
               top: 50%;
               position: relative;
             }
@@ -125,9 +135,10 @@ use RemoteService\RemoteServiceImpl;
               left: 50%;
               transform: translate(-50%, -50%);
             }</style>";
-        echo "<div class='parent'>
+            echo "<div class='parent'>
                     <div class='child'><div>Problem in verifying signature. Please contact administrator.</div><div><strong>Track Id:</strong> $tracker</div></div>
               </div>";
+        }
     }
 
 

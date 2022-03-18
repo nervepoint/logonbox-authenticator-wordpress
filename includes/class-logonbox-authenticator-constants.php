@@ -10,6 +10,7 @@ class Logonbox_Authenticator_Constants
     const SESSION_ENCODED_PAYLOAD = "logonbox_authenticator_encoded_payload";
     const SESSION_MARK_USER_AUTHORIZED = "logonbox_authenticator_is_authorized";
     const SESSION_RECORD_LAST_URI = "logonbox_authenticator_last_uri";
+    const SESSION_REJECT_FLASH_MESSAGE = "logonbox_authenticator_reject_flash_message";
 
     const OPTIONS_MENU_SLUG = "logonbox_authenticator_main_menu";
 

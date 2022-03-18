@@ -213,6 +213,16 @@ class Logonbox_Authenticator_Admin {
 	    Logonbox_Authenticator_Util::clear_all_session_data();
     }
 
+    function logonbox_authenticator_login_message(): string
+    {
+        if (isset($_SESSION[Logonbox_Authenticator_Constants::SESSION_REJECT_FLASH_MESSAGE])) {
+            unset($_SESSION[Logonbox_Authenticator_Constants::SESSION_REJECT_FLASH_MESSAGE]);
+            return "<div id='login_error'>	<strong>ERROR</strong>: Request rejected.<br></div>";
+        }
+
+        return "";
+    }
+
     // HELPER METHODS
 
     function logonbox_authenticator_settings_page() {

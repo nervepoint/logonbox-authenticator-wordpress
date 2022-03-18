@@ -169,6 +169,7 @@ class Logonbox_Authenticator {
         $this->loader->add_action("wp_logout", $plugin_admin, "logonbox_authenticator_wp_logout");
 
         $this->loader->add_filter("authenticate", $plugin_admin, "logonbox_custom_authenticator", 10, 3);
+        $this->loader->add_filter("login_message", $plugin_admin, "logonbox_authenticator_login_message");
 
 	}
 
