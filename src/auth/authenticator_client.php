@@ -397,8 +397,6 @@ class AuthenticatorClient
 
             $success = Strings::unpackSSH2("bs", $data);
 
-            var_dump($success[1]);
-
             if (!$success[0])
             {
                 throw new Exception("The server did not respond with a valid response!");
