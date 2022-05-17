@@ -18,7 +18,7 @@ class Logonbox_Authenticator_Constants
 
     const OPTIONS_GROUP = "logonbox-authenticator-settings-group";
     const OPTIONS_HOST = "logonbox_authenticator_host";
-    const OPTIONS_PORT = "logonbox_authenticator_port";
+    const OPTIONS_MISSING_ARTIFACTS = "logonbox_authenticator_missing_artifacts";
     const OPTIONS_ACTIVE = "logonbox_authenticator_active";
     const OPTIONS_DEBUG = "logonbox_authenticator_debug";
 

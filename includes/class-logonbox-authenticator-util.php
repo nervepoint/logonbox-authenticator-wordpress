@@ -5,7 +5,7 @@ use Logger\LoggerService;
 class Logonbox_Authenticator_Util {
 
     // LOGGER
-    private static ?Logonbox_Authenticator_Logger $logger = null;
+    private static $logger;
 
     public static function safeCheckLogger() {
         if (self::$logger == null) {
@@ -13,7 +13,7 @@ class Logonbox_Authenticator_Util {
         }
     }
 
-    public static function setUpLogger(bool $debug = false) {
+    public static function setUpLogger($debug = false) {
         self::$logger = new Logonbox_Authenticator_Logger();
         self::$logger->enableDebug($debug);
     }
@@ -104,8 +104,8 @@ class Logonbox_Authenticator_Util {
         return self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_HOST);
     }
 
-    static function logonbox_authenticator_port_option() : int {
-        return intval(self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_PORT));
+    static function logonbox_authenticator_missing_artifacts() : string {
+        return self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS, "ALLOW_LOGIN");
     }
 
     static function logonbox_authenticator_active_option() : bool {
@@ -118,10 +118,10 @@ class Logonbox_Authenticator_Util {
 
     // VALIDATION
 
-    static function is_valid_domain_name($domain_name): bool
+    static function is_valid_host($host): bool
     {
-        $result = filter_var($domain_name, FILTER_VALIDATE_DOMAIN, array("flags" => FILTER_FLAG_HOSTNAME));
-        return !is_bool($result) && $result == $domain_name;
+        $result = filter_var($host, FILTER_VALIDATE_URL);
+        return !is_bool($result) && $result == $host;
     }
 
     // TRACKER CODE

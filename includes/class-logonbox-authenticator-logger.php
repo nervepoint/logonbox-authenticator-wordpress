@@ -4,25 +4,30 @@ use Logger\LoggerService;
 
 class Logonbox_Authenticator_Logger implements LoggerService
 {
-    private bool $debug = false;
+    private $debug = true;
 
-    public function info(string $message)
+    public function info($message)
     {
-        error_log(($this->debug ? "Debug:" : "Info:") . $message);
+	    $this->app_error_log(($this->debug ? "Debug:" : "Info:") . $message);
     }
 
-    public function error(string $message, Exception $exception)
+    public function error($message, $exception)
     {
-        error_log("Error:" . $message);
+	    $this->app_error_log("Error:" . $message);
     }
 
-    public function enableDebug(bool $debug)
+    public function enableDebug($debug)
     {
         $this->debug = $debug;
     }
 
-    public function isDebug(): bool
+    public function isDebug()
     {
         return $this->debug;
+    }
+
+    private function app_error_log($txt)
+    {
+        error_log($txt);
     }
 }

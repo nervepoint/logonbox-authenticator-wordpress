@@ -160,7 +160,7 @@ class Logonbox_Authenticator_Admin {
 
         // play nicely with other plugins if they have higher priority than us
         if (is_a($user, "WP_User")) {
-            Logonbox_Authenticator_Util::info_log("User object is set, returning." . $user->user_login);
+            Logonbox_Authenticator_Util::info_log("User object is set, returning " . $user->user_login);
             return $user;
         }
 
@@ -188,6 +188,19 @@ class Logonbox_Authenticator_Admin {
             } else {
                 Logonbox_Authenticator_Util::info_log("Primary auth succeeded, starting second factor for $username");
                 try {
+                    $missing_artifacts = Logonbox_Authenticator_Util::logonbox_authenticator_missing_artifacts();
+                    $email = $user->user_email;    
+                    if ($email == "" && $missing_artifacts == "DENY_LOGIN") 
+                    {
+                        throw new RuntimeException("Missing email, deny login");
+                    }
+
+                    if ($email == "" && $missing_artifacts == "ALLOW_LOGIN") 
+                    {
+                        Logonbox_Authenticator_Util::info_log("Allowing user with empty email for username " . $username);
+                        return $user;
+                    }
+
                     $this->start_logonbox_authenticator_second_factor_process($user);
                 } catch (Exception $exception) {
                     $tracker = Logonbox_Authenticator_Util::tracker_code();
@@ -249,7 +262,7 @@ class Logonbox_Authenticator_Admin {
         add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_HOST, 'Host', array($this, 'logonbox_authenticator_settings_host'),
             Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
 
-        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_PORT, 'Port', array($this, 'logonbox_authenticator_settings_port'),
+        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS, 'Missing Artifacts', array($this, 'logonbox_authenticator_missing_artifacts'),
             Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
 
         add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_ACTIVE, 'Active', array($this, 'logonbox_authenticator_settings_active'),
@@ -262,8 +275,7 @@ class Logonbox_Authenticator_Admin {
         register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_HOST,
             array ("sanitize_callback" => array($this, 'logonbox_authenticator_sanitize_host')) );
 
-        register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_PORT,
-            array ("sanitize_callback" => array($this, 'logonbox_authenticator_sanitize_port')) );
+        register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS);
 
         register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_ACTIVE);
 
@@ -274,14 +286,33 @@ class Logonbox_Authenticator_Admin {
         $tag = Logonbox_Authenticator_Constants::OPTIONS_HOST;
         $host = esc_attr(Logonbox_Authenticator_Util::logonbox_authenticator_get_option($tag));
         echo "<input id='$tag' name='$tag' size='40' type='text' value='$host' />";
-        echo "<br /> <small><i>Hostname to connect which hosts keys for users. e.g. my.company.directory</i></small>";
+        echo "<br /> <small><i>Hostname (with protocol and port) to connect which hosts keys for users. e.g. https://my.company.directory</i></small>";
     }
 
-    function logonbox_authenticator_settings_port() {
-        $tag = Logonbox_Authenticator_Constants::OPTIONS_PORT;
-        $port = esc_attr(Logonbox_Authenticator_Util::logonbox_authenticator_get_option($tag));
-        echo "<input id='$tag' name='$tag' size='10' type='text' value='$port' />";
-        echo "<br /> <small><i>Port on which keys directory is hosted, typically 443 HTTPS. Range (1 - 65535)</i></small>";
+    function logonbox_authenticator_missing_artifacts() {
+        $tag = Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS;
+        $option = esc_attr(Logonbox_Authenticator_Util::logonbox_authenticator_get_option($tag));
+         
+        $allow = "";
+        $deny = "";
+
+        if ($option === "ALLOW_LOGIN" || $option == null || $option == "")
+        {
+            $allow = "selected='true'";
+            $deny = "";
+        }
+        else 
+        {
+            
+            $deny = "selected='true'";
+            $allow = "";
+        }
+        
+        echo "<select id='$tag' name='$tag'>";
+        echo "<option value='ALLOW_LOGIN' $allow>Allow Login</option>";
+        echo "<option value='DENY_LOGIN' $deny>Deny Login</option>";
+        echo "</select>";
+        echo "<br /> <small><i>Describes how authenticator should behave in case email is missing for an end user; email is required for fetching keys and is important for basic functioning. Note: If you choose 'deny' end users without email would be locked out.</i></small>";
     }
 
     function logonbox_authenticator_settings_active() {
@@ -297,25 +328,22 @@ class Logonbox_Authenticator_Admin {
     }
 
     function logonbox_authenticator_sanitize_host( $input ) {
-        if (!Logonbox_Authenticator_Util::is_valid_domain_name($input)) {
+        if (!Logonbox_Authenticator_Util::is_valid_host($input)) {
             add_settings_error(Logonbox_Authenticator_Constants::OPTIONS_HOST, "", "Invalid hostname.");
             return "";
         }
 
-        return $input;
-    }
+        Logonbox_Authenticator_Util::info_log("Checking hostname " . $input);
 
-    function logonbox_authenticator_sanitize_port( $input ) {
-        $port = $input;
-        if (! is_numeric($port)) {
-            add_settings_error(Logonbox_Authenticator_Constants::OPTIONS_PORT, "", "Port should be numeric.");
+        $response = wp_remote_get( $input . "/discover" );
+
+        $http_code = wp_remote_retrieve_response_code( $response );
+
+        Logonbox_Authenticator_Util::info_log("The status code is " . $http_code);
+
+        if (!is_numeric($http_code) || intval($http_code) != 200) {
+            add_settings_error(Logonbox_Authenticator_Constants::OPTIONS_HOST, "", "Cannot connect hostname.");
             return "";
-        } else {
-         $portNum =  intval($port);
-         if (! ($portNum > 0 && $portNum < 65536)) {
-             add_settings_error(Logonbox_Authenticator_Constants::OPTIONS_PORT, "", "Port not in range (1 - 65535).");
-             return "";
-         }
         }
 
         return $input;
@@ -328,6 +356,7 @@ class Logonbox_Authenticator_Admin {
     private function start_logonbox_authenticator_second_factor_process(WP_User $user): void
     {
         $username = $user->user_login;
+        $email = $user->user_email;
 
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
@@ -343,16 +372,19 @@ class Logonbox_Authenticator_Admin {
             session_start();
         }
 
-        $remoteService = new RemoteServiceImpl(Logonbox_Authenticator_Util::logonbox_authenticator_host_option(),
-            Logonbox_Authenticator_Util::logonbox_authenticator_port_option(),
-            Logonbox_Authenticator_Util::logger()
+        $host = parse_url(Logonbox_Authenticator_Util::logonbox_authenticator_host_option(), PHP_URL_HOST);
+        $port = parse_url(Logonbox_Authenticator_Util::logonbox_authenticator_host_option(), PHP_URL_PORT);
+
+        $remoteService = new RemoteServiceImpl($host,
+            $port, Logonbox_Authenticator_Util::logger()
         );
+
         $authenticatorClient = new AuthenticatorClient($remoteService);
 
         $authenticatorRequest = $authenticatorClient
-            ->generateRequest($username, get_site_url() . "/index.php/logonbox-authenticator-verify-signature?response={response}");
+            ->generateRequest($email, get_site_url() . "/index.php/logonbox-authenticator-verify-signature?response={response}");
 
-        $session_data = Logonbox_Authenticator_Util::setup_session_payload($username, $authenticatorRequest->getEncodedPayload(), $redirect_uri);
+        $session_data = Logonbox_Authenticator_Util::setup_session_payload($email, $authenticatorRequest->getEncodedPayload(), $redirect_uri);
 
         $_SESSION[Logonbox_Authenticator_Constants::SESSION_ENCODED_PAYLOAD] = $session_data;
 

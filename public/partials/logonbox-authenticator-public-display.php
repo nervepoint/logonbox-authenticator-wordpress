@@ -63,8 +63,10 @@ use RemoteService\RemoteServiceImpl;
 
             unset($_SESSION[Logonbox_Authenticator_Constants::SESSION_ENCODED_PAYLOAD]);
 
-            $remoteService = new RemoteServiceImpl(Logonbox_Authenticator_Util::logonbox_authenticator_host_option(),
-                Logonbox_Authenticator_Util::logonbox_authenticator_port_option(), Logonbox_Authenticator_Util::logger());
+            $host = parse_url(Logonbox_Authenticator_Util::logonbox_authenticator_host_option(), PHP_URL_HOST);
+            $port = parse_url(Logonbox_Authenticator_Util::logonbox_authenticator_host_option(), PHP_URL_PORT);
+
+            $remoteService = new RemoteServiceImpl($host, $port, Logonbox_Authenticator_Util::logger());
             $authenticatorClient = new AuthenticatorClient($remoteService);
 
             $authenticatorRequest = new AuthenticatorRequest($authenticatorClient, $data->encoded_payload);
@@ -82,7 +84,13 @@ use RemoteService\RemoteServiceImpl;
 
                 add_filter( "authenticate", "allow_programmatic_login", 5, 3 );
 
-                $user = wp_signon( array( "user_login" => $target_user ) );
+                Logonbox_Authenticator_Util::info_log("Attempting fetching wp user by email " . $target_user);
+
+                $user_from_source = get_user_by('email', $target_user);
+
+                Logonbox_Authenticator_Util::info_log("wp user from source username found as " . $user_from_source->user_login);
+
+                $user = wp_signon( array( "user_login" => $user_from_source->user_login ) );
 
                 remove_filter( "authenticate", "allow_programmatic_login", 5);
 

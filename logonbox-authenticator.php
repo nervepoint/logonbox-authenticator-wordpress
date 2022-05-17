@@ -87,4 +87,5 @@ function run_plugin_name() {
 	$plugin->run();
 
 }
+
 run_plugin_name();
