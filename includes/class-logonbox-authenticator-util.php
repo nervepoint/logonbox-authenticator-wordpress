@@ -102,6 +102,10 @@ class Logonbox_Authenticator_Util {
         }
     }
 
+    static function logonbox_authenticator_host_option_url() : string {
+        return "https://" . self::logonbox_authenticator_host_option();
+    }
+
     static function logonbox_authenticator_host_option() : string {
         return self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_HOST);
     }

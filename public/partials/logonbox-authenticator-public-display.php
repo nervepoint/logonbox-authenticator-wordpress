@@ -63,8 +63,10 @@ use RemoteService\RemoteServiceImpl;
 
             unset($_SESSION[Logonbox_Authenticator_Constants::SESSION_ENCODED_PAYLOAD]);
 
-            $host = parse_url(Logonbox_Authenticator_Util::logonbox_authenticator_host_option(), PHP_URL_HOST);
-            $port = parse_url(Logonbox_Authenticator_Util::logonbox_authenticator_host_option(), PHP_URL_PORT);
+            $host_url = Logonbox_Authenticator_Util::logonbox_authenticator_host_option_url();
+        
+            $host = parse_url($host_url, PHP_URL_HOST);
+            $port = parse_url($host_url, PHP_URL_PORT);
 
             $remoteService = new RemoteServiceImpl($host, $port, Logonbox_Authenticator_Util::logger());
             $authenticatorClient = new AuthenticatorClient($remoteService, Logonbox_Authenticator_Util::logger());

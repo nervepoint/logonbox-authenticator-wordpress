@@ -316,7 +316,7 @@ class Logonbox_Authenticator_Admin {
         $tag = Logonbox_Authenticator_Constants::OPTIONS_HOST;
         $host = esc_attr(Logonbox_Authenticator_Util::logonbox_authenticator_get_option($tag));
         echo "<input id='$tag' name='$tag' size='40' type='text' value='$host' />";
-        echo "<br /> <small><i>Hostname (with protocol and port) to connect which hosts keys for users. e.g. https://my.company.directory or https://my.company.directory:8443</i></small>";
+        echo "<br /> <small><i>Hostname (with port) to connect for keys of end users. e.g. my.company.directory or my.company.directory:8443</i></small>";
     }
 
     function logonbox_authenticator_missing_artifacts() {
@@ -342,13 +342,13 @@ class Logonbox_Authenticator_Admin {
         echo "<option value='ALLOW_LOGIN' $allow>Allow Login</option>";
         echo "<option value='DENY_LOGIN' $deny>Deny Login</option>";
         echo "</select>";
-        echo "<br /> <small><i>Describes how authenticator should behave in case keys are not yet setup for an end user; cryptographic keys are required for basic functioning and authentication. Note: If you choose 'deny' end users without keys would be locked out.</i></small>";
+        echo "<br /> <small><i>Describes how authenticator should behave in case keys are not yet setup for an end user; cryptographic keys are required for basic functioning and authentication.</i></small><br /><small><strong>Note: If you choose 'deny' end users without keys would be locked out.</strong></small>";
     }
 
     function logonbox_authenticator_settings_active() {
         $tag = Logonbox_Authenticator_Constants::OPTIONS_ACTIVE;
         echo "<input name='$tag' id='$tag' type='checkbox' value='1' class='code' " . checked( 1, Logonbox_Authenticator_Util::logonbox_authenticator_get_option( $tag ), false ) . " /> <label for='$tag'>Active</label>";
-        echo "<br /> <small><i>Activate LogonBox authenticator, please note if hostname, end user keys are not setup you can lock the system, you can allow end users without keys with missing artifacts option, which is set to allow with no keys by default. Once system is tested and setup you can change missing artifacts option to deny to disallow end users without key setup. On activation current session is still valid, before you log out, ensure system is setup properly.</i></small><br /> <small><i><strong>Note: If host option is not set properly this option will be reverted to disabled state. Setup host first then only activate plugin.</strong></i></small>";
+        echo "<br /> <small><i>Activate LogonBox authenticator, please note if hostname, end user keys are not setup you would lock the system, you can allow end users without keys with missing artifacts option, which is set to allow with no keys by default. Once system is tested and setup you can change missing artifacts option to deny to disallow end users without key setup. On activation current session is still valid, before you log out, ensure system is setup properly.</i></small><br /> <small><i><strong>Note: If host option is not set properly this option will be reverted to disabled state. Setup host first then only activate plugin.</strong></i></small>";
     }
 
     function logonbox_authenticator_settings_debug() {
@@ -358,14 +358,17 @@ class Logonbox_Authenticator_Admin {
     }
 
     function logonbox_authenticator_sanitize_host( $input ) {
-        if (!Logonbox_Authenticator_Util::is_valid_host($input)) {
+        
+        $host = "https://" . $input;
+
+        if (!Logonbox_Authenticator_Util::is_valid_host($host)) {
             add_settings_error(Logonbox_Authenticator_Constants::OPTIONS_HOST, "", "Invalid hostname.");
             return "";
         }
 
-        Logonbox_Authenticator_Util::info_log("Checking hostname " . $input);
+        Logonbox_Authenticator_Util::info_log("Checking hostname " . $host);
 
-        $response = wp_remote_get( $input . "/discover" );
+        $response = wp_remote_get($host . "/discover" );
 
         $http_code = wp_remote_retrieve_response_code( $response );
 
@@ -388,10 +391,12 @@ class Logonbox_Authenticator_Admin {
         $username = $user->user_login;
         $email = $user->user_email;
 
-        $host = parse_url(Logonbox_Authenticator_Util::logonbox_authenticator_host_option(), PHP_URL_HOST);
-        $port = parse_url(Logonbox_Authenticator_Util::logonbox_authenticator_host_option(), PHP_URL_PORT);
+        $host_url = Logonbox_Authenticator_Util::logonbox_authenticator_host_option_url();
 
-         Logonbox_Authenticator_Util::debug_log("Remote host info " . $host . " " . $port . ".");
+        $host = parse_url($host_url, PHP_URL_HOST);
+        $port = parse_url($host_url, PHP_URL_PORT);
+
+         Logonbox_Authenticator_Util::debug_log("Remote host info [" . $host . "] [" . $port . "].");
 
         $remoteService = new RemoteServiceImpl($host,
             $port, Logonbox_Authenticator_Util::logger()
