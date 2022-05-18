@@ -61,9 +61,11 @@ class Logonbox_Authenticator_Util {
     }
 
     static function clear_all_session_data() {
-        unset($_SESSION[Logonbox_Authenticator_Constants::SESSION_MARK_USER_AUTHORIZED]);
-        unset($_SESSION[Logonbox_Authenticator_Constants::SESSION_ENCODED_PAYLOAD]);
-        unset($_SESSION[Logonbox_Authenticator_Constants::SESSION_RECORD_LAST_URI]);
+        if (isset($_SESSION)) {
+            unset($_SESSION[Logonbox_Authenticator_Constants::SESSION_MARK_USER_AUTHORIZED]);
+            unset($_SESSION[Logonbox_Authenticator_Constants::SESSION_ENCODED_PAYLOAD]);
+            unset($_SESSION[Logonbox_Authenticator_Constants::SESSION_RECORD_LAST_URI]);
+        }
     }
 
     // URI/URL

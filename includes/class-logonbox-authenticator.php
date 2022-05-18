@@ -166,10 +166,12 @@ class Logonbox_Authenticator {
         $this->loader->add_action("init", $plugin_admin, "logonbox_authenticator_init", 10);
 		$this->loader->add_action("admin_menu", $plugin_admin, "logonbox_authenticator_options");
 		$this->loader->add_action("update_option_" . Logonbox_Authenticator_Constants::OPTIONS_DEBUG, $plugin_admin,"logonbox_authenticator_option_debug_updated", 1, 3);
+		$this->loader->add_action("update_option_" . Logonbox_Authenticator_Constants::OPTIONS_ACTIVE, $plugin_admin,"logonbox_authenticator_option_active_updated", 1, 3);
         $this->loader->add_action("wp_logout", $plugin_admin, "logonbox_authenticator_wp_logout");
 
         $this->loader->add_filter("authenticate", $plugin_admin, "logonbox_custom_authenticator", 10, 3);
         $this->loader->add_filter("login_message", $plugin_admin, "logonbox_authenticator_login_message");
+        $this->loader->add_filter("pre_update_option_" .  Logonbox_Authenticator_Constants::OPTIONS_ACTIVE, $plugin_admin, "logonbox_authenticator_option_active_pre_update", 10, 2 );
 
 	}
 
