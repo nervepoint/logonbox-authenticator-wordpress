@@ -211,29 +211,17 @@ class Logonbox_Authenticator_Admin {
         Logonbox_Authenticator_Util::setUpLogger($value);
     }
 
+    function logonbox_authenticator_option_missing_artifacts_updated($old_value, $value, $option) {
+        if ($value == "DENY_LOGIN") {
+            Logonbox_Authenticator_Util::info_log("Checking to mark session as valid on missing artifacts option update.");
+            $this->mark_session_as_valid();
+        }
+    }
+
     function logonbox_authenticator_option_active_updated($old_value, $value, $option) {
         if ($value) {
-            // check user is logged and can activate plugin
-            if (is_user_logged_in())
-            {
-                if(session_status() == PHP_SESSION_NONE) {
-                    session_start();
-                }
-
-                $user = wp_get_current_user();
-                $username = $user->user_login;
-
-                if ($user->exists())
-                {
-                    Logonbox_Authenticator_Util::info_log("Marking session on active option update for user " . $username);
-                    $_SESSION[Logonbox_Authenticator_Constants::SESSION_MARK_USER_AUTHORIZED] = "true";
-                }
-                else
-                {
-                    Logonbox_Authenticator_Util::info_log("User does not exists cannot mark session on plugin activation for user " . $username);
-                }
-
-            }
+            Logonbox_Authenticator_Util::info_log("Checking to mark session as valid on active option update.");
+            $this->mark_session_as_valid();
         }
     }
 
@@ -342,7 +330,7 @@ class Logonbox_Authenticator_Admin {
         echo "<option value='ALLOW_LOGIN' $allow>Allow Login</option>";
         echo "<option value='DENY_LOGIN' $deny>Deny Login</option>";
         echo "</select>";
-        echo "<br /> <small><i>Describes how authenticator should behave in case keys are not yet setup for an end user; cryptographic keys are required for basic functioning and authentication.</i></small><br /><small><strong>Note: If you choose 'deny' end users without keys would be locked out.</strong></small>";
+        echo "<br /> <small><i>Describes how authenticator should behave in case keys are not yet setup for an end user; cryptographic keys are required for basic functioning and authentication.</i></small><br /><small><strong>Note: If you choose 'deny' end users without keys would be locked out. Depending on PHP or Wordpress version end user might loose session with immediate effect; however current admin session would stay active.</strong></small>";
     }
 
     function logonbox_authenticator_settings_active() {
@@ -446,5 +434,29 @@ class Logonbox_Authenticator_Admin {
         wp_redirect($authenticatorRequest->getSignUrl());
 
         exit();
+    }
+
+    private function mark_session_as_valid() {
+        // check user is logged and can activate plugin
+        if (is_user_logged_in())
+        {
+            if(session_status() == PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            $user = wp_get_current_user();
+            $username = $user->user_login;
+
+            if ($user->exists())
+            {
+                Logonbox_Authenticator_Util::info_log("Marking session on option update for user " . $username);
+                $_SESSION[Logonbox_Authenticator_Constants::SESSION_MARK_USER_AUTHORIZED] = "true";
+            }
+            else
+            {
+                Logonbox_Authenticator_Util::info_log("User does not exists cannot mark session on plugin activation for user " . $username);
+            }
+
+        }
     }
 }
