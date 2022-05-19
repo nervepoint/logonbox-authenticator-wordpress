@@ -330,7 +330,7 @@ class Logonbox_Authenticator_Admin {
         echo "<option value='ALLOW_LOGIN' $allow>Allow Login</option>";
         echo "<option value='DENY_LOGIN' $deny>Deny Login</option>";
         echo "</select>";
-        echo "<br /> <small><i>Describes how authenticator should behave in case keys are not yet setup for an end user; cryptographic keys are required for basic functioning and authentication.</i></small><br /><small><strong>Note: If you choose 'deny' end users without keys would be locked out. Depending on PHP or Wordpress version end user might loose session with immediate effect; however current admin session would stay active.</strong></small>";
+        echo "<br /> <small><i>Describes how authenticator should behave in case keys are not yet setup for an end user; cryptographic keys are required for basic functioning and authentication.</i></small><br /><small><strong>Note: If you choose 'deny' end users without keys would be locked out and all with active session might loose it with immediate effect; however current admin session would stay active.</strong></small>";
     }
 
     function logonbox_authenticator_settings_active() {
