@@ -1,114 +1,43 @@
-=== Plugin Name ===
-Contributors: (this should be a list of wordpress.org userid's)
-Donate link: http://example.com/
-Tags: comments, spam
-Requires at least: 3.0.1
-Tested up to: 3.4
-Stable tag: 4.3
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+=== LogonBox Authenticator ===
+Contributors: tanktarta
+Donate link: https://logonbox.com/
+Tags: authentication, authenticator, login, two-factor, username
+Requires at least: 5.0
+Tested up to: 6.0
+Stable tag: 0.1
+License: Apache-2.0
+License URI: https://www.apache.org/licenses/LICENSE-2.0
 
-Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
+Adds two-factor authentication for user and administrators via LogonBox Authenticator.
 
 == Description ==
+[See our video on how LogonBox Authenticator works.](https://www.logonbox.com/content/logonbox-authenticator/)
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+LogonBox Authenticator provides simple to use two-factor authentication for your users, armed with only a mobile app.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
-
-A few notes about the sections above:
-
-*   "Contributors" is a comma separated list of wp.org/wp-plugins.org usernames
-*   "Tags" is a comma separated list of tags that apply to the plugin
-*   "Requires at least" is the lowest version that the plugin will work on
-*   "Tested up to" is the highest version that you've *successfully used to test the plugin*. Note that it might work on
-higher versions... this is just the highest one you've verified.
-*   Stable tag should indicate the Subversion "tag" of the latest stable version, or "trunk," if you use `/trunk/` for
-stable.
-
-    Note that the `readme.txt` of the stable tag is the one that is considered the defining one for the plugin, so
-if the `/trunk/readme.txt` file says that the stable tag is `4.3`, then it is `/tags/4.3/readme.txt` that'll be used
-for displaying information about the plugin.  In this situation, the only thing considered from the trunk `readme.txt`
-is the stable tag pointer.  Thus, if you develop in trunk, you can update the trunk `readme.txt` to reflect changes in
-your in-development version, without having that information incorrectly disclosed about the current stable version
-that lacks those changes -- as long as the trunk's `readme.txt` points to the correct stable tag.
-
-    If no stable tag is provided, it is assumed that trunk is stable, but you should specify "trunk" if that's where
-you put the stable version, in order to eliminate any doubt.
+In order to use this plugin, you will require access to one of our on-prem or cloud products to act as a server for 
+the authentication. All users that you wish to protect with 2FA must also exist on this product with identical email addresses.  
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
-e.g.
-
-1. Upload `plugin-name.php` to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `<?php do_action('plugin_name_hook'); ?>` in your templates
+See [our instructions](https://docs.logonbox.com/app/manpage/en/article/7737790).
 
 == Frequently Asked Questions ==
 
-= A question that someone might have =
+= How do I get started with LogonBox Authenticator? =
 
-An answer to that question.
+Before installing the plugin, you'll need either your own separate LogonBox server, or your users will need accounts on our Cloud Directory service. To sign up for a free account at [LogonBox Directory](https://XXXXXXXXXXXXXXXXXXXX).
 
-= What about foo bar? =
+= Can I protect my own applications using LogonBox Authenticator? =
 
-Answer to foo bar dilemma.
+We have a growing number of libraries and extensions for various languages and frameworks available on GitHub, for example [Java](https://github.com/nervepoint/logonbox-authenticator-java), [Python](https://github.com/nervepoint/logonbox-authenticator-python), [Node/Javascript](https://github.com/nervepoint/logonbox-authenticator-nodejs). More to come! 
 
 == Screenshots ==
+1. LogonBox Authenticator adds a second factor authentication to your WordPress login. Your users log in normally with their WordPress username and password. Next they will have to pass LogonBox Authenticator,  Then they’ll be  challenged to complete secondary authentication via Duo Push, phone callback, or one-time passcodes generated via the Duo Mobile app or delivered via SMS.
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+2. The plugin has minimal configuration. You can use your own Directory server simply by supplying it's address here.   
 
 == Changelog ==
 
-= 1.0 =
-* A change since the previous version.
-* Another change.
-
-= 0.5 =
-* List versions from most recent at top to oldest at bottom.
-
-== Upgrade Notice ==
-
-= 1.0 =
-Upgrade notices describe the reason a user should upgrade.  No more than 300 characters.
-
-= 0.5 =
-This version fixes a security related bug.  Upgrade immediately.
-
-== Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones above.  This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation."  Arbitrary sections will be shown below the built-in sections outlined above.
-
-== A brief Markdown Example ==
-
-Ordered list:
-
-1. Some feature
-1. Another feature
-1. Something else about the plugin
-
-Unordered list:
-
-* something
-* something else
-* third thing
-
-Here's a link to [WordPress](http://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
-Titles are optional, naturally.
-
-[markdown syntax]: http://daringfireball.net/projects/markdown/syntax
-            "Markdown is what the parser uses to process much of the readme file"
-
-Markdown uses email style notation for blockquotes and I've been told:
-> Asterisks for *emphasis*. Double it up  for **strong**.
-
-`<?php code(); // goes in backticks ?>`
+= 0.1 =
+* Initial public beta release!

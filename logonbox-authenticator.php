@@ -8,19 +8,19 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              http://example.com
+ * @link              https://www.logonbox.com/content/logonbox-authenticator/
  * @since             1.0.0
  * @package           Logonbox_Authenticator
  *
  * @wordpress-plugin
  * Plugin Name:       Logonbox Authenticator
- * Plugin URI:        http://example.com/plugin-name-uri/
- * Description:       Provides second factor authentication by LogonBox.
- * Version:           1.0.0
+ * Plugin URI:        https://www.logonbox.com/content/logonbox-authenticator/
+ * Description:       Adds two-factor authentication for users and administrators via LogonBox Authenticator.
+ * Version:           0.1
  * Author:            LogonBox
- * Author URI:        http://example.com/
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Author URI:        https://www.logonbox.com
+ * License:           Apache-2.0
+ * License URI:       https://www.apache.org/licenses/LICENSE-2.0
  * Text Domain:       logonbox-authenticator
  * Domain Path:       /languages
  */
@@ -35,7 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-const PLUGIN_NAME_VERSION = '1.0.0';
+const PLUGIN_NAME_VERSION = '0.1';
 
 /**
  * The code that runs during plugin activation.
