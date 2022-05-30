@@ -17,6 +17,15 @@ Safeguard your people, passwords and apps with [LogonBox's](https://logonbox.com
 
 ## Installation
 
+### From Plugin Repository
+
+The plugin is available at the WordPress plugin repository. Install as you would any other plugin.
+
+### From Source
+
 ```
 composer install
+zip -r logonbox-authenticator-wordpress-main.zip .
 ```
+
+Then use `Plugins -> Add New -> Upload Plugin` and browser for the above zip file.
