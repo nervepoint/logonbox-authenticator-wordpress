@@ -97,7 +97,7 @@ class Logonbox_Authenticator_Admin {
 	public function logonbox_authenticator_options() {
 
 	    // add a menu page
-        add_menu_page( 'Logonbox Authenticator', 'Logonbox Authenticator',
+	    add_menu_page( __('Logonbox Authenticator', 'logonbox-authenticator'), __('Logonbox Authenticator', 'logonbox-authenticator'),
             'manage_options', Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, array($this, 'logonbox_authenticator_settings_page') );
 
         //call register settings function
@@ -117,6 +117,19 @@ class Logonbox_Authenticator_Admin {
         if (!$active) {
             Logonbox_Authenticator_Util::debug_log("Logonbox authenticator not active.");
             return;
+        }
+        
+        if (is_user_logged_in()) {
+            $user = wp_get_current_user();
+            Logonbox_Authenticator_Util::debug_log("User is logged in, do we apply LBA to them?");
+            if (in_array( 'administrator', (array) $user->roles ) && !Logonbox_Authenticator_Util::logonbox_authenticator_use_for_administrators_option()) {
+                Logonbox_Authenticator_Util::debug_log("User is an administrator, but LBA is not enabled for administrators.");
+                return;
+            }
+            if (!in_array( 'administrator', (array) $user->roles ) && !Logonbox_Authenticator_Util::logonbox_authenticator_use_for_users_option()) {
+                Logonbox_Authenticator_Util::debug_log("User is a normal user, but LBA is not enabled for normal users.");
+                return;
+            } 
         }
 
         if (session_status() == PHP_SESSION_NONE) {
@@ -186,6 +199,15 @@ class Logonbox_Authenticator_Admin {
                 Logonbox_Authenticator_Util::info_log("Authentication call failed to return WP_User instance for " . $username);
                 return $user;
             } else {
+                if (in_array( 'administrator', (array) $user->roles ) && !Logonbox_Authenticator_Util::logonbox_authenticator_use_for_administrators_option()) {
+                    Logonbox_Authenticator_Util::debug_log("User is an administrator, but LBA is not enabled for administrators.");
+                    return $user;
+                }
+                if (!in_array( 'administrator', (array) $user->roles ) && !Logonbox_Authenticator_Util::logonbox_authenticator_use_for_users_option()) {
+                    Logonbox_Authenticator_Util::debug_log("User is a normal user, but LBA is not enabled for normal users.");
+                    return $user;
+                } 
+                
                 Logonbox_Authenticator_Util::info_log("Primary auth succeeded, starting second factor for $username");
                 try {
                     $allowed_user = $this->start_logonbox_authenticator_second_factor_process($user);
@@ -195,10 +217,11 @@ class Logonbox_Authenticator_Admin {
                 } catch (Exception $exception) {
                     $tracker = Logonbox_Authenticator_Util::tracker_code();
                     Logonbox_Authenticator_Util::error_log("Tracker: " . $tracker . " : " . $exception, $exception);
-                    return new WP_Error("LogonBox authentication_failed",
-                        __("<strong>ERROR</strong>: Authentication failed, please contact administrator. Track Id: $tracker"));
+                    return new WP_Error(__("LogonBox authentication failed", "logonbox-authenticator"),
+                        sprintf("<strong>%s</strong>: %s", __("ERROR", "logonbox-authenticator"),
+                        /* translators: tracker code */
+                        sprintf( esc_html__( "Authentication failed, please contact administrator. Track Id: %s", "logonbox-authenticator" ), $tracker )));
                 }
-
             }
         }
     }
@@ -216,6 +239,22 @@ class Logonbox_Authenticator_Admin {
             Logonbox_Authenticator_Util::info_log("Checking to mark session as valid on missing artifacts option update.");
             $this->mark_session_as_valid();
         }
+    }
+    
+    function logonbox_authenticator_option_prompt_text_updated($old_value, $value, $option) {
+        //
+    }
+    
+    function logonbox_authenticator_option_authorize_text_updated($old_value, $value, $option) {
+        //
+    }
+    
+    function logonbox_authenticator_option_use_for_administrators_updated($old_value, $value, $option) {
+        //
+    }
+    
+    function logonbox_authenticator_option_use_for_users_updated($old_value, $value, $option) {
+        //
     }
 
     function logonbox_authenticator_option_active_updated($old_value, $value, $option) {
@@ -248,7 +287,7 @@ class Logonbox_Authenticator_Admin {
     {
         if (isset($_SESSION[Logonbox_Authenticator_Constants::SESSION_REJECT_FLASH_MESSAGE])) {
             unset($_SESSION[Logonbox_Authenticator_Constants::SESSION_REJECT_FLASH_MESSAGE]);
-            return "<div id='login_error'>	<strong>ERROR</strong>: Request rejected.<br></div>";
+            return sprintf("<div id='login_error'>	<strong>%s</strong>: %s.<br></div>", __("ERROR", "logonbox-authenticator"), __("Request rejected", "logonbox-authenticator") );
         }
 
         return "";
@@ -274,28 +313,48 @@ class Logonbox_Authenticator_Admin {
     }
 
     function logonbox_authenticator_register_settings() {
-        add_settings_section(Logonbox_Authenticator_Constants::OPTIONS_SECTION, 'LogonBox Authenticator Settings', null,
+        add_settings_section(Logonbox_Authenticator_Constants::OPTIONS_SECTION, __('LogonBox Authenticator Settings', 'logonbox-authenticator'), null,
             Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG);
 
-        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_HOST, 'Host', array($this, 'logonbox_authenticator_settings_host'),
+        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_HOST, __('Host', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_settings_host'),
+            Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
+        
+        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_PROMPT_TEXT, __('Prompt Text', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_settings_prompt_text'),
+            Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
+        
+        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_AUTHORIZE_TEXT, __('Authorize Text', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_settings_authorize_text'),
             Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
 
-        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS, 'Missing Artifacts', array($this, 'logonbox_authenticator_missing_artifacts'),
+        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS, __('Missing Artifacts', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_missing_artifacts'),
             Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
 
-        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_ACTIVE, 'Active', array($this, 'logonbox_authenticator_settings_active'),
+        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_ACTIVE, __('Active', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_settings_active'),
+            Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
+        
+        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_USE_FOR_ADMINISTRATORS, __('Administrators', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_settings_use_for_administrators'),
+            Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
+        
+        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_USE_FOR_USERS, __('Users', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_settings_use_for_users'),
             Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
 
-        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_DEBUG, 'Debug', array($this, 'logonbox_authenticator_settings_debug'),
+        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_DEBUG, __('Debug', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_settings_debug'),
             Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
 
         //register our settings
         register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_HOST,
             array ("sanitize_callback" => array($this, 'logonbox_authenticator_sanitize_host')) );
+        
+        register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_PROMPT_TEXT);
+        
+        register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_AUTHORIZE_TEXT);
 
         register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS);
 
         register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_ACTIVE);
+        
+        register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_USE_FOR_ADMINISTRATORS);
+        
+        register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_USE_FOR_USERS);
 
         register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_DEBUG);
     }
@@ -304,7 +363,21 @@ class Logonbox_Authenticator_Admin {
         $tag = Logonbox_Authenticator_Constants::OPTIONS_HOST;
         $host = esc_attr(Logonbox_Authenticator_Util::logonbox_authenticator_get_option($tag));
         echo "<input id='$tag' name='$tag' size='40' type='text' value='$host' />";
-        echo "<br /> <small><i>Hostname (with port) to connect for keys of end users. e.g. my.company.directory or my.company.directory:8443</i></small>";
+        printf("<br /> <small><i>%s</i></small>", esc_html__("Hostname (with port) to connect for keys of end users. e.g. my.company.directory or my.company.directory:8443", 'logonbox-authenticator'));
+    }
+    
+    function logonbox_authenticator_settings_prompt_text() {
+        $tag = Logonbox_Authenticator_Constants::OPTIONS_PROMPT_TEXT;
+        $prompt = esc_attr(Logonbox_Authenticator_Util::logonbox_authenticator_get_option($tag));
+        echo "<input id='$tag' name='$tag' size='40' type='text' value='$prompt' />";
+        printf("<br /> <small><i>%s</i></small>", esc_html__("The prompt to display in the mobile app. The strings <b>{remoteName}</b>, <b>{principal}</b> and <b>{hostname}</b> will be replaced with the corresponding values. Leave blank for default provided by platform.", 'logonbox-authenticator'));
+    }
+    
+    function logonbox_authenticator_settings_authorize_text() {
+        $tag = Logonbox_Authenticator_Constants::OPTIONS_AUTHORIZE_TEXT;
+        $prompt = esc_attr(Logonbox_Authenticator_Util::logonbox_authenticator_get_option($tag));
+        echo "<input id='$tag' name='$tag' size='40' type='text' value='$prompt' />";
+        printf("<br /> <small><i>%s</i></small>", esc_html__("The text to display on the the 'Authorize' button in the mobile app. Leave blank for default provided by platform.", 'logonbox-authenticator'));
     }
 
     function logonbox_authenticator_missing_artifacts() {
@@ -327,22 +400,34 @@ class Logonbox_Authenticator_Admin {
         }
         
         echo "<select id='$tag' name='$tag'>";
-        echo "<option value='ALLOW_LOGIN' $allow>Allow Login</option>";
-        echo "<option value='DENY_LOGIN' $deny>Deny Login</option>";
+        echo "<option value='ALLOW_LOGIN' $allow>" . esc_html__("Allow Login") . "</option>";
+        echo "<option value='DENY_LOGIN' $deny>" . esc_html__("Deny Login") . "</option>";
         echo "</select>";
-        echo "<br /> <small><i>Describes how authenticator should behave in case keys are not yet setup for an end user; cryptographic keys are required for basic functioning and authentication.</i></small><br /><small><strong>Note: If you choose 'deny' end users without keys would be locked out and all with active session might loose it with immediate effect; however current admin session would stay active.</strong></small>";
+        printf("<br /> <small><i>%s</i></small>", esc_html__("Describes how authenticator should behave in case keys are not yet setup for an end user; cryptographic keys are required for basic functioning and authentication.</i></small><br /><small><strong>Note: If you choose \'deny\' end users without keys would be locked out and all with active session might loose it with immediate effect; however current admin session would stay active.", 'logonbox-authenticator'));
     }
 
     function logonbox_authenticator_settings_active() {
         $tag = Logonbox_Authenticator_Constants::OPTIONS_ACTIVE;
-        echo "<input name='$tag' id='$tag' type='checkbox' value='1' class='code' " . checked( 1, Logonbox_Authenticator_Util::logonbox_authenticator_get_option( $tag ), false ) . " /> <label for='$tag'>Active</label>";
-        echo "<br /> <small><i>Activate LogonBox authenticator, please note if hostname, end user keys are not setup you would lock the system, you can allow end users without keys with missing artifacts option, which is set to allow with no keys by default. Once system is tested and setup you can change missing artifacts option to deny to disallow end users without key setup. On activation current session is still valid, before you log out, ensure system is setup properly.</i></small><br /> <small><i><strong>Note: If host option is not set properly this option will be reverted to disabled state. Setup host first then only activate plugin.</strong></i></small>";
+        echo "<input name='$tag' id='$tag' type='checkbox' value='1' class='code' " . checked( 1, Logonbox_Authenticator_Util::logonbox_authenticator_get_option( $tag ), false ) . " /> <label for='$tag'>" . esc_html__("Active", "logonbox-authenticator") . "</label>";
+        printf("<br /> <small><i>%s</i></small>", esc_html__("Activate LogonBox authenticator, please note if hostname, end user keys are not setup you would lock the system, you can allow end users without keys with missing artifacts option, which is set to allow with no keys by default. Once system is tested and setup you can change missing artifacts option to deny to disallow end users without key setup. On activation current session is still valid, before you log out, ensure system is setup properly.</i></small><br /> <small><i><strong>Note: If host option is not set properly this option will be reverted to disabled state. Setup host first then only activate plugin.", 'logonbox-authenticator'));
+    }
+    
+    function logonbox_authenticator_settings_use_for_administrators() {
+        $tag = Logonbox_Authenticator_Constants::OPTIONS_USE_FOR_ADMINISTRATORS;
+        echo "<input name='$tag' id='$tag' type='checkbox' value='1' class='code' " . checked( 1, Logonbox_Authenticator_Util::logonbox_authenticator_get_option( $tag ), false ) . " /> <label for='$tag'>" . esc_html__("Use for administrators", "logonbox-authenticator") . "</label>";
+        printf("<br /> <small><i>%s</i></small>", esc_html__("Use LogonBox authenticator for administrator users.", 'logonbox-authenticator'));
+    }
+    
+    function logonbox_authenticator_settings_use_for_users() {
+        $tag = Logonbox_Authenticator_Constants::OPTIONS_USE_FOR_USERS;
+        echo "<input name='$tag' id='$tag' type='checkbox' value='1' class='code' " . checked( 1, Logonbox_Authenticator_Util::logonbox_authenticator_get_option( $tag ), false ) . " /> <label for='$tag'>" . esc_html__("Use for users", "logonbox-authenticator") . "</label>";
+        printf("<br /> <small><i>%s</i></small>", esc_html__("Use LogonBox authenticator for normal users.", 'logonbox-authenticator'));
     }
 
     function logonbox_authenticator_settings_debug() {
         $tag = Logonbox_Authenticator_Constants::OPTIONS_DEBUG;
-        echo "<input name='$tag' id='$tag' type='checkbox' value='1' class='code' " . checked( 1, Logonbox_Authenticator_Util::logonbox_authenticator_get_option( $tag ), false ) . " /> <label for='$tag'>Debug</label>";
-        echo "<br /> <small><i>Enable debug logs.</i></small>";
+        echo "<input name='$tag' id='$tag' type='checkbox' value='1' class='code' " . checked( 1, Logonbox_Authenticator_Util::logonbox_authenticator_get_option( $tag ), false ) . " /> <label for='$tag'>" . esc_html__("Debug", "logonbox-authenticator") . "</label>";
+        printf("<br /> <small><i>%s</i></small>", esc_html__("Enable debug logs.", 'logonbox-authenticator'));
     }
 
     function logonbox_authenticator_sanitize_host( $input ) {
@@ -350,7 +435,7 @@ class Logonbox_Authenticator_Admin {
         $host = "https://" . $input;
 
         if (!Logonbox_Authenticator_Util::is_valid_host($host)) {
-            add_settings_error(Logonbox_Authenticator_Constants::OPTIONS_HOST, "", "Invalid hostname.");
+            add_settings_error(Logonbox_Authenticator_Constants::OPTIONS_HOST, "", __("Invalid hostname."));
             return "";
         }
 
@@ -363,7 +448,7 @@ class Logonbox_Authenticator_Admin {
         Logonbox_Authenticator_Util::info_log("The status code is " . $http_code);
 
         if (!is_numeric($http_code) || intval($http_code) != 200) {
-            add_settings_error(Logonbox_Authenticator_Constants::OPTIONS_HOST, "", "Cannot connect hostname.");
+            add_settings_error(Logonbox_Authenticator_Constants::OPTIONS_HOST, "", __("Cannot connect hostname."));
             return "";
         }
 
@@ -391,6 +476,12 @@ class Logonbox_Authenticator_Admin {
         );
 
         $authenticatorClient = new AuthenticatorClient($remoteService, Logonbox_Authenticator_Util::logger());
+        if(Logonbox_Authenticator_Util::logonbox_authenticator_prompt_text_option() != "") {
+            $authenticatorClient->setPromptText(Logonbox_Authenticator_Util::logonbox_authenticator_prompt_text_option());
+        }
+        if(Logonbox_Authenticator_Util::logonbox_authenticator_authorize_text_option() != "") {
+            $authenticatorClient->setAuthorizeText(Logonbox_Authenticator_Util::logonbox_authenticator_authorize_text_option());
+        }
 
         $keys = $authenticatorClient->getUserKeys($email);
         $keys_length = count($keys);
@@ -421,6 +512,9 @@ class Logonbox_Authenticator_Admin {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
+        
+        
+        Logonbox_Authenticator_Util::debug_log("Generting request for " . $email);
 
         $authenticatorRequest = $authenticatorClient
             ->generateRequest($email, get_site_url() . "/index.php/logonbox-authenticator-verify-signature?response={response}");

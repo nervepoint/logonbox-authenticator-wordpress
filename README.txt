@@ -3,6 +3,7 @@ Contributors: tanktarta
 Donate link: https://logonbox.com/
 Tags: authentication, authenticator, login, two-factor, username
 Requires at least: 5.0
+Requires PHP: 7.3
 Tested up to: 6.0
 Stable tag: 0.1
 License: Apache-2.0
@@ -16,7 +17,9 @@ Adds two-factor authentication for user and administrators via LogonBox Authenti
 LogonBox Authenticator provides simple to use two-factor authentication for your users, armed with only a mobile app.
 
 In order to use this plugin, you will require access to one of our on-prem or cloud products to act as a server for 
-the authentication. All users that you wish to protect with 2FA must also exist on this product with identical email addresses.  
+the authentication. All users that you wish to protect with 2FA must also exist on this product with identical email addresses.
+
+If you are evaluating this plugin, we recommended that you sign up for a free account at [LogonBox](https://www.logonbox.com/content/authenticator/begin/)   
 
 == Installation ==
 
@@ -26,7 +29,7 @@ See [our instructions](https://docs.logonbox.com/app/manpage/en/article/7737790)
 
 = How do I get started with LogonBox Authenticator? =
 
-Before installing the plugin, you'll need either your own separate LogonBox server, or your users will need accounts on our Cloud Directory service. To sign up for a free account at [LogonBox Directory](https://XXXXXXXXXXXXXXXXXXXX).
+Before installing the plugin, you'll need either your own separate LogonBox server, or your users will need accounts on our Cloud Directory service. To sign up for a free account at [LogonBox Directory](https://www.logonbox.com/content/authenticator/begin/).
 
 = Can I protect my own applications using LogonBox Authenticator? =
 
@@ -37,7 +40,9 @@ We have a growing number of libraries and extensions for various languages and f
 
 2. The plugin has minimal configuration. You can use your own Directory server simply by supplying it's address here.   
 
+== Upgrade Notice ==
+
 == Changelog ==
 
 = 0.1 =
-* Initial public beta release!
+Initial public beta release!

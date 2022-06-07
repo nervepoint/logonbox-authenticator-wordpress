@@ -107,7 +107,15 @@ class Logonbox_Authenticator_Util {
     }
 
     static function logonbox_authenticator_host_option() : string {
-        return self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_HOST);
+        return self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_HOST, "agent.logonbox.directory");
+    }
+    
+    static function logonbox_authenticator_prompt_text_option() : string {
+        return self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_PROMPT_TEXT);
+    }
+    
+    static function logonbox_authenticator_authorize_text_option() : string {
+        return self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_AUTHORIZE_TEXT);
     }
 
     static function logonbox_authenticator_missing_artifacts() : string {
@@ -116,6 +124,14 @@ class Logonbox_Authenticator_Util {
 
     static function logonbox_authenticator_active_option() : bool {
         return boolval(self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_ACTIVE));
+    }
+    
+    static function logonbox_authenticator_use_for_administrators_option() : bool {
+        return boolval(self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_USE_FOR_ADMINISTRATORS, FALSE));
+    }
+    
+    static function logonbox_authenticator_use_for_users_option() : bool {
+        return boolval(self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_USE_FOR_USERS, TRUE));
     }
 
     static function logonbox_authenticator_debug_option() : bool {

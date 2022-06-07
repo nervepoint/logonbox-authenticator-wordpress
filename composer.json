@@ -29,7 +29,7 @@
 		"php" : ">=7.3",
 		"phpseclib/phpseclib" : "3.0.*",
 		"nategood/httpful" : "0.3.*",
-		"logonbox/authenticator": "^0.0.1"
+		"logonbox/authenticator" : "dev-main"
 	},
 	"require-dev" : {
 		"phpunit/phpunit" : "^9.5"
