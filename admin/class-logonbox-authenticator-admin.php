@@ -234,9 +234,9 @@ class Logonbox_Authenticator_Admin {
         Logonbox_Authenticator_Util::setUpLogger($value);
     }
 
-    function logonbox_authenticator_option_missing_artifacts_updated($old_value, $value, $option) {
+    function logonbox_authenticator_option_new_users_updated($old_value, $value, $option) {
         if ($value == "DENY_LOGIN") {
-            Logonbox_Authenticator_Util::info_log("Checking to mark session as valid on missing artifacts option update.");
+            Logonbox_Authenticator_Util::info_log("Checking to mark session as valid on new users option update.");
             $this->mark_session_as_valid();
         }
     }
@@ -325,7 +325,7 @@ class Logonbox_Authenticator_Admin {
         add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_AUTHORIZE_TEXT, __('Authorize Text', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_settings_authorize_text'),
             Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
 
-        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS, __('Missing Artifacts', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_missing_artifacts'),
+        add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_NEW_USERS, __('New Users', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_settings_new_users'),
             Logonbox_Authenticator_Constants::OPTIONS_MENU_SLUG, Logonbox_Authenticator_Constants::OPTIONS_SECTION);
 
         add_settings_field(Logonbox_Authenticator_Constants::OPTIONS_ACTIVE, __('Active', 'logonbox-authenticator'), array($this, 'logonbox_authenticator_settings_active'),
@@ -348,7 +348,7 @@ class Logonbox_Authenticator_Admin {
         
         register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_AUTHORIZE_TEXT);
 
-        register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS);
+        register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_NEW_USERS);
 
         register_setting( Logonbox_Authenticator_Constants::OPTIONS_GROUP, Logonbox_Authenticator_Constants::OPTIONS_ACTIVE);
         
@@ -380,8 +380,8 @@ class Logonbox_Authenticator_Admin {
         printf("<br /> <small><i>%s</i></small>", esc_html__("The text to display on the the 'Authorize' button in the mobile app. Leave blank for default provided by platform.", 'logonbox-authenticator'));
     }
 
-    function logonbox_authenticator_missing_artifacts() {
-        $tag = Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS;
+    function logonbox_authenticator_settings_new_users() {
+        $tag = Logonbox_Authenticator_Constants::OPTIONS_NEW_USERS;
         $option = esc_attr(Logonbox_Authenticator_Util::logonbox_authenticator_get_option($tag));
          
         $allow = "";
@@ -409,7 +409,9 @@ class Logonbox_Authenticator_Admin {
     function logonbox_authenticator_settings_active() {
         $tag = Logonbox_Authenticator_Constants::OPTIONS_ACTIVE;
         echo "<input name='$tag' id='$tag' type='checkbox' value='1' class='code' " . checked( 1, Logonbox_Authenticator_Util::logonbox_authenticator_get_option( $tag ), false ) . " /> <label for='$tag'>" . esc_html__("Active", "logonbox-authenticator") . "</label>";
-        printf("<br /> <small><i>%s</i></small>", esc_html__("Activate LogonBox authenticator, please note if hostname, end user keys are not setup you would lock the system, you can allow end users without keys with missing artifacts option, which is set to allow with no keys by default. Once system is tested and setup you can change missing artifacts option to deny to disallow end users without key setup. On activation current session is still valid, before you log out, ensure system is setup properly.</i></small><br /> <small><i><strong>Note: If host option is not set properly this option will be reverted to disabled state. Setup host first then only activate plugin.", 'logonbox-authenticator'));
+        printf("<br /> <small><i>%s</i></small>", esc_html__("Activate LogonBox authenticator, please note if hostname, end user keys are not setup you would lock the system, you can allow end users without keys with 'New Users' option, which is set to allow with no keys by default. Once system is tested and setup you can change missing artifacts option to deny to disallow end users without key setup. On activation current session is still valid, before you log out, ensure system is setup properly.", 'logonbox-authenticator'));
+        printf("<br /> <strong>%s</strong>", esc_html__("Note: If host option is not set properly this option will be reverted to disabled state. Setup host first then only activate plugin.", 'logonbox-authenticator'));
+        
     }
     
     function logonbox_authenticator_settings_use_for_administrators() {
@@ -488,10 +490,10 @@ class Logonbox_Authenticator_Admin {
 
         if ($keys_length == 0)
         {
-            $missing_artifacts = Logonbox_Authenticator_Util::logonbox_authenticator_missing_artifacts();
+            $new_users = Logonbox_Authenticator_Util::logonbox_authenticator_new_users();
                     
 
-            if ($missing_artifacts == "ALLOW_LOGIN") 
+            if ($new_users == "ALLOW_LOGIN") 
             {
                 Logonbox_Authenticator_Util::info_log("Allowing user with empty keys " . $username);
                 return $user;

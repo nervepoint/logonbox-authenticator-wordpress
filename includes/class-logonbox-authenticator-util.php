@@ -118,8 +118,8 @@ class Logonbox_Authenticator_Util {
         return self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_AUTHORIZE_TEXT);
     }
 
-    static function logonbox_authenticator_missing_artifacts() : string {
-        return self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS, "ALLOW_LOGIN");
+    static function logonbox_authenticator_new_users() : string {
+        return self::logonbox_authenticator_get_option(Logonbox_Authenticator_Constants::OPTIONS_NEW_USERS, "ALLOW_LOGIN");
     }
 
     static function logonbox_authenticator_active_option() : bool {

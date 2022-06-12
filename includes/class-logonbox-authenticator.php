@@ -169,7 +169,7 @@ class Logonbox_Authenticator {
 		$this->loader->add_action("update_option_" . Logonbox_Authenticator_Constants::OPTIONS_ACTIVE, $plugin_admin,"logonbox_authenticator_option_active_updated", 1, 3);
 		$this->loader->add_action("update_option_" . Logonbox_Authenticator_Constants::OPTIONS_USE_FOR_ADMINISTRATORS, $plugin_admin,"logonbox_authenticator_option_user_for_administrators_updated", 1, 3);
 		$this->loader->add_action("update_option_" . Logonbox_Authenticator_Constants::OPTIONS_USE_FOR_USERS, $plugin_admin,"logonbox_authenticator_option_user_for_administrators_users", 1, 3);
-		$this->loader->add_action("update_option_" . Logonbox_Authenticator_Constants::OPTIONS_MISSING_ARTIFACTS, $plugin_admin,"logonbox_authenticator_option_missing_artifacts_updated", 1, 3);
+		$this->loader->add_action("update_option_" . Logonbox_Authenticator_Constants::OPTIONS_NEW_USERS, $plugin_admin,"logonbox_authenticator_option_new_users_updated", 1, 3);
         $this->loader->add_action("wp_logout", $plugin_admin, "logonbox_authenticator_wp_logout");
 
         $this->loader->add_filter("authenticate", $plugin_admin, "logonbox_custom_authenticator", 10, 3);

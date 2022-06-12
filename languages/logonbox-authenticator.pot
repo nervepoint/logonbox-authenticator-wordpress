@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-06-08T00:12:02+01:00\n"
+"POT-Creation-Date: 2022-06-08T10:25:01+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: logonbox-authenticator\n"
@@ -70,7 +70,7 @@ msgid "Authorize Text"
 msgstr ""
 
 #: admin/class-logonbox-authenticator-admin.php:328
-msgid "Missing Artifacts"
+msgid "New Users"
 msgstr ""
 
 #: admin/class-logonbox-authenticator-admin.php:331
@@ -87,7 +87,7 @@ msgid "Users"
 msgstr ""
 
 #: admin/class-logonbox-authenticator-admin.php:340
-#: admin/class-logonbox-authenticator-admin.php:429
+#: admin/class-logonbox-authenticator-admin.php:431
 msgid "Debug"
 msgstr ""
 
@@ -108,25 +108,29 @@ msgid "Describes how authenticator should behave in case keys are not yet setup 
 msgstr ""
 
 #: admin/class-logonbox-authenticator-admin.php:412
-msgid "Activate LogonBox authenticator, please note if hostname, end user keys are not setup you would lock the system, you can allow end users without keys with missing artifacts option, which is set to allow with no keys by default. Once system is tested and setup you can change missing artifacts option to deny to disallow end users without key setup. On activation current session is still valid, before you log out, ensure system is setup properly.</i></small><br /> <small><i><strong>Note: If host option is not set properly this option will be reverted to disabled state. Setup host first then only activate plugin."
+msgid "Activate LogonBox authenticator, please note if hostname, end user keys are not setup you would lock the system, you can allow end users without keys with 'New Users' option, which is set to allow with no keys by default. Once system is tested and setup you can change missing artifacts option to deny to disallow end users without key setup. On activation current session is still valid, before you log out, ensure system is setup properly."
 msgstr ""
 
-#: admin/class-logonbox-authenticator-admin.php:417
+#: admin/class-logonbox-authenticator-admin.php:413
+msgid "Note: If host option is not set properly this option will be reverted to disabled state. Setup host first then only activate plugin."
+msgstr ""
+
+#: admin/class-logonbox-authenticator-admin.php:419
 msgid "Use for administrators"
 msgstr ""
 
-#: admin/class-logonbox-authenticator-admin.php:418
+#: admin/class-logonbox-authenticator-admin.php:420
 msgid "Use LogonBox authenticator for administrator users."
 msgstr ""
 
-#: admin/class-logonbox-authenticator-admin.php:423
+#: admin/class-logonbox-authenticator-admin.php:425
 msgid "Use for users"
 msgstr ""
 
-#: admin/class-logonbox-authenticator-admin.php:424
+#: admin/class-logonbox-authenticator-admin.php:426
 msgid "Use LogonBox authenticator for normal users."
 msgstr ""
 
-#: admin/class-logonbox-authenticator-admin.php:430
+#: admin/class-logonbox-authenticator-admin.php:432
 msgid "Enable debug logs."
 msgstr ""

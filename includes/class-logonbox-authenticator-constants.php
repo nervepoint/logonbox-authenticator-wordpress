@@ -20,7 +20,7 @@ class Logonbox_Authenticator_Constants
     const OPTIONS_HOST = "logonbox_authenticator_host";
     const OPTIONS_PROMPT_TEXT = "logonbox_authenticator_prompt_text";
     const OPTIONS_AUTHORIZE_TEXT = "logonbox_authenticator_authorize_text";
-    const OPTIONS_MISSING_ARTIFACTS = "logonbox_authenticator_missing_artifacts";
+    const OPTIONS_NEW_USERS = "logonbox_authenticator_new_users";
     const OPTIONS_ACTIVE = "logonbox_authenticator_active";
     const OPTIONS_USE_FOR_ADMINISTRATORS = "logonbox_authenticator_use_for_administrators";
     const OPTIONS_USE_FOR_USERS = "logonbox_authenticator_use_for_users";
